@@ -1,68 +1,72 @@
-import { Text, StyleSheet, View } from 'react-native';
-import ScreenLayout from '../components/layout/ScreenLayout';
+import { View, StyleSheet } from "react-native";
+import { Text, Card, Avatar } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useUserData } from "../hooks/useSWRData";
 
 export default function ProfileScreen() {
+  // Use SWR to fetch user data
+  const { user, isLoading, error } = useUserData();
+
   return (
-    <ScreenLayout>
-      <View style={styles.header}>
-        <View style={styles.avatar} />
-        <Text style={styles.name}>John Doe</Text>
-        <Text style={styles.email}>john.doe@example.com</Text>
+    <SafeAreaView style={styles.container} edges={["right", "left"]}>
+      <View style={styles.content}>
+        <Text variant="headlineMedium" style={styles.title}>
+          Profile
+        </Text>
+
+        <Card style={styles.card}>
+          {isLoading ? (
+            <Card.Content style={styles.centerContent}>
+              <Text>Loading...</Text>
+            </Card.Content>
+          ) : error ? (
+            <Card.Content style={styles.centerContent}>
+              <Text>Error loading profile</Text>
+            </Card.Content>
+          ) : user ? (
+            <Card.Content>
+              <View style={styles.profileHeader}>
+                <Avatar.Text size={60} label={user.name.substring(0, 2)} />
+                <View style={styles.profileInfo}>
+                  <Text variant="titleLarge">{user.name}</Text>
+                  <Text variant="bodyMedium">{user.email}</Text>
+                </View>
+              </View>
+            </Card.Content>
+          ) : (
+            <Card.Content style={styles.centerContent}>
+              <Text>No user found</Text>
+            </Card.Content>
+          )}
+        </Card>
       </View>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account Information</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>Username</Text>
-          <Text>johndoe</Text>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.label}>Member Since</Text>
-          <Text>Jan 1, 2023</Text>
-        </View>
-      </View>
-    </ScreenLayout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    alignItems: 'center',
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
     marginBottom: 24,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#ccc',
-    marginBottom: 16,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 16,
-    color: '#666',
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
   },
   card: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+  profileHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  profileInfo: {
+    marginLeft: 16,
+  },
+  centerContent: {
+    alignItems: "center",
+    padding: 16,
   },
 });
